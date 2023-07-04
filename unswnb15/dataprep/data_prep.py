@@ -3,6 +3,28 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 import os
+import gdown
+
+
+def get_raw_data_from_gdrive(base_path):
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
+
+    url_1 = 'https://drive.google.com/uc?id=1Z52nd_a-vZsfMgu0X4ixV8S_S03yL8Al'
+    output_1 = f"{base_path}/UNSW-NB15_1.csv"
+    gdown.download(url_1, output_1, quiet=False)
+
+    url_2 = 'https://drive.google.com/uc?id=12JoI35p41tQX8nHwHHwCXRyG9wDNNDJa'
+    output_2 = f"{base_path}/UNSW-NB15_2.csv"
+    gdown.download(url_2, output_2, quiet=False)
+
+    url_3 = 'https://drive.google.com/uc?id=1r6UlCkDC05B3wntZCeEwQWyvnrZxdV_0'
+    output_3 = f"{base_path}/UNSW-NB15_3.csv"
+    gdown.download(url_3, output_3, quiet=False)
+
+    url_4 = 'https://drive.google.com/uc?id=1BPjgzSDgnPz2TDRljz7kNtdkCwuTRESW'
+    output_4 = f"{base_path}/UNSW-NB15_4.csv"
+    gdown.download(url_4, output_4, quiet=False)
 
 
 def read_data(base_path):
@@ -116,20 +138,23 @@ def prepare_train_val_test_split_and_save_to_file(x, y, test_rate, valid_rate, p
         np.save(f"{path}/y_test_data.npy", y[train_row_size:, :, :])
 
 
-def prepare_unsw_nb_15_all_dataset(base_path):
-    input_path = f"{base_path}/Datasets/UNSW-NB15-CSV-Files"
-    data = read_data(input_path)
+def prepare_unsw_nb_15_all_dataset():
+    base_path = "unswnb15/dataset"
+    get_raw_data_from_gdrive(f"{base_path}/raw")
+    data = read_data(f"{base_path}/raw")
     data = select_10_best_features(data)
+    print(data.info(verbose=True))
+    output_base_path = f"{base_path}/processed"
 
-    for t in ['srcip-dport']:  # , 'dstip-dport' , 'dstip-dport'
+    for t in ['srcip-dport', 'dstip-dport']:
         print(f"Type: {t}")
-        for w_1 in [20]:  # , 50, 100, 200 , 50, 100, 200
-            for w_2 in [300]:  # , 600, 1200,1800, 2400, 3000
+        for w_1 in [20, 50, 100, 200]:
+            for w_2 in [300, 600, 1200, 1800, 2400, 3000]:
                 print(f"\t\twin_1: {w_1}, win_2: {w_2}")
                 x, y = create_lstm_dataset(data, w_1, w_2, t)
-                prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.2, f"{base_path}/lstm_prediction/data_prep/{t}/60-20-20/w{w_1}_p{w_2}")
-                # prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.1, f"{base_path}/lstm_prediction/data_prep/{t}/60-10-30/w{w_1}_p{w_2}")
-                # prepare_train_val_test_split_and_save_to_file(x, y, 0.3, 0.0, f"{base_path}/lstm_prediction/data_prep/{t}/70-30/w{w_1}_p{w_2}")
+                prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.2, f"{output_base_path}/{t}/60-20-20/w{w_1}_p{w_2}")
+                prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.1, f"{output_base_path}/{t}/60-10-30/w{w_1}_p{w_2}")
+                prepare_train_val_test_split_and_save_to_file(x, y, 0.3, 0.0, f"{output_base_path}/{t}/70-30/w{w_1}_p{w_2}")
 
 
 def select_10_best_features(data):

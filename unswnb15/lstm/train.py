@@ -18,14 +18,14 @@ def create_lstm_model():
     return model
 
 
-def train_lstm_model(base_path):
-    for split_shape in ["60-20-20"]: # , "60-10-30", "70-30"
+def unswnb15_train_lstm_model(base_path):
+    for split_shape in ["60-20-20", "60-10-30", "70-30"]:
         print(f"Split shape: {split_shape}")
-        for window_1 in [20]: #, 50, 100, 200
+        for window_1 in [20, 50, 100, 200]:
             print(f"\tWindow 1: {window_1}")
-            for window_2 in [300]: # , 600, 1200, 1800, 2400, 3000
+            for window_2 in [300, 600, 1200, 1800, 2400, 3000]:
                 print(f"\t\tWindow 2: {window_2}")
-                for t in ["srcip-dport"]: # , "dstip-dport"
+                for t in ["srcip-dport", "dstip-dport"]:
                     print(f"\t\t\tType: {t}")
                     path = base_path + "/" + t + "/" + split_shape + "/w" + str(window_1) + "_p" + str(window_2)
                     x_train = np.load(f"{path}/x_train_data.npy")

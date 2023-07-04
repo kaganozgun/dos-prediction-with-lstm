@@ -255,8 +255,7 @@ def calculate_rule_based_unswnb15_dstip_dport(data):
     data_to_excel.book.save(path)
 
 
-def calculate_rule_based_unswnb15(base_path):
-    input_path = f"{base_path}/Datasets/UNSW-NB15-CSV-Files"
+def calculate_rule_based_unswnb15(input_path):
     data = read_data(input_path)
     calculate_rule_based_unswnb15_srcip_dport(data)
     calculate_rule_based_unswnb15_dstip_dport(data)

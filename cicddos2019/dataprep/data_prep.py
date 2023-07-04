@@ -3,6 +3,16 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 import os
+import gdown
+
+
+def get_raw_data_from_gdrive(base_path):
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
+
+    url = 'https://drive.google.com/uc?id=15PcFtWWFTrzLqGuWqBic6aYkodkN2DUV'
+    output = f"{base_path}/data_w_selected_features.csv"
+    gdown.download(url, output, quiet=False)
 
 
 def read_data(input_path, normal_attack_rate):
@@ -86,6 +96,7 @@ def create_lstm_dataset(data, input_win_size, pred_win_size, output_type):
 
     x = np.dstack(x).astype("float32")
     y = np.dstack(y).astype("float32")
+
     x = x.transpose((2, 0, 1))
     y = y.transpose((2, 0, 1))
     return x, y
@@ -116,16 +127,19 @@ def prepare_train_val_test_split_and_save_to_file(x, y, test_rate, valid_rate, p
         np.save(f"{path}/y_test_data.npy", y[train_row_size:, :, :])
 
 
-def prepare_cicdos2019_all_dataset(base_path):
-    input_path = f"{base_path}/data/data_w_selected_features.csv"
+def prepare_cicddos2019_all_dataset():
+    base_path = "cicddos2019/dataset"
+    get_raw_data_from_gdrive(f"{base_path}/raw")
+    input_path = f"{base_path}/raw/data_w_selected_features.csv"
     data = read_data(input_path, 0.3)
+    output_base_path = f"{base_path}/processed"
 
-    for t in ['srcip', 'dstip']:
+    for t in ['dstip', 'srcip']:
         print(f"Type: {t}")
-        for w_1 in [50, 100, 200 , 50, 100, 200]: # , 20
+        for w_1 in [20, 50, 100, 200]:
             for w_2 in [300, 600, 1200, 1800, 2400, 3000]:
                 print(f"\t\twin_1: {w_1}, win_2: {w_2}")
                 x, y = create_lstm_dataset(data, w_1, w_2, t)
-                #prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.2, f"{base_path}/lstm_prediction/data_prep/{t}/60-20-20/w{w_1}_p{w_2}")
-                #prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.1, f"{base_path}/lstm_prediction/data_prep/{t}/60-10-30/w{w_1}_p{w_2}")
-                prepare_train_val_test_split_and_save_to_file(x, y, 0.3, 0.0, f"{base_path}/lstm_prediction/data_prep/{t}/70-30/w{w_1}_p{w_2}")
+                prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.2, f"{output_base_path}/{t}/60-20-20/w{w_1}_p{w_2}")
+                prepare_train_val_test_split_and_save_to_file(x, y, 0.2, 0.1, f"{output_base_path}/{t}/60-10-30/w{w_1}_p{w_2}")
+                prepare_train_val_test_split_and_save_to_file(x, y, 0.3, 0.0, f"{output_base_path}/{t}/70-30/w{w_1}_p{w_2}")

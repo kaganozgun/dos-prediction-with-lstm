@@ -5,7 +5,7 @@ from sklearn.metrics import classification_report
 
 
 def read_data(input_path, normal_attack_rate):
-    data = pd.read_csv(input_path)
+    data = pd.read_csv(input_path + "/data_w_selected_features.csv")
     data = data.dropna()
     data.loc[data["label"] == "BENIGN", "label_bn"] = 0
     data.loc[data["label"] != "BENIGN", "label_bn"] = 1
@@ -252,8 +252,7 @@ def calculate_rule_based_cicddos2019_dstip(data):
     data_to_excel.book.save(path)
 
 
-def calculate_rule_based_cicddos2019(base_path, sample_rate):
-    input_path = f"{base_path}/data/data_w_selected_features.csv"
+def calculate_rule_based_cicddos2019(input_path, sample_rate):
     data = read_data(input_path, sample_rate)
     calculate_rule_based_cicddos2019_srcip(data)
     calculate_rule_based_cicddos2019_dstip(data)

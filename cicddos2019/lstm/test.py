@@ -6,19 +6,18 @@ from tensorflow.keras.models import load_model
 from sklearn.metrics import classification_report
 
 
-def cicddos2019_test():
+def cicddos2019_test(base_path):
     result_df = pd.DataFrame()
-    for data_type in ["srcip", "dstip"]:  # , "dstip-dport"
-        for split_shape in ["60-20-20"]:  # , "60-10-30", "70-30"
-            for window_1 in [20]:  # , 50, 100, 200
-                for window_2 in [300, 600, 1200, 1800, 2400, 3000]:  # , 600, 1200, 1800, 2400, 3000
-                    base_path = "/Users/kagan.ozgun/Desktop/YL/Tez/CIC-DDoS2019/lstm_prediction/data_prep/" + data_type \
-                                + "/" + split_shape + "/w" + str(window_1) + "_p" + str(window_2)
-                    x_test = np.load(f"{base_path}/x_test_data.npy")
-                    y_test = np.load(f"{base_path}/y_test_data.npy")
+    for data_type in ["dstip", "srcip"]:
+        for split_shape in ["60-20-20", "70-30", "60-10-30"]:
+            for window_1 in [20, 50, 100, 200]:
+                for window_2 in [300, 600, 1200, 1800, 2400, 3000]:
+                    path = base_path + "/" + data_type + "/" + split_shape + "/w" + str(window_1) + "_p" + str(window_2)
+                    x_test = np.load(f"{path}/x_test_data.npy")
+                    y_test = np.load(f"{path}/y_test_data.npy")
                     y_test = y_test.reshape(-1)
 
-                    model = load_model(f"{base_path}/final.h5")
+                    model = load_model(f"{path}/final.h5")
                     y_pred = np.round(model.predict(x_test)).flatten()
                     report = classification_report(y_test, y_pred, output_dict=True)
 

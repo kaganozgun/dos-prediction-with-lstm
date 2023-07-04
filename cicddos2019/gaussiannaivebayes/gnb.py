@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report
 
 def cicddos2019_gaussian_naive_bayes(base_path):
     result_df = pd.DataFrame()
-    for t in ["srcip", "dstip"]:
+    for t in ["dstip", "srcip"]:
         print(f"\t\t\tType: {t}")
         for window_1 in [20, 50, 100, 200]:
             print(f"\tWindow 1: {window_1}")
