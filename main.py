@@ -1,5 +1,3 @@
-#  Copyright (c) 2023. Kağan Özgün ITU Computer Engineering
-
 import os
 import random as rn
 import numpy as np

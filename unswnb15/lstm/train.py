@@ -1,4 +1,3 @@
-#  Copyright (c) 2023. Kağan Özgün ITU Computer Engineering
 import tensorflow as tf
 import numpy as np
 

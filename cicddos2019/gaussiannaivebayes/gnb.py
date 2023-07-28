@@ -1,5 +1,3 @@
-#  Copyright (c) 2023. Kağan Özgün ITU Computer Engineering
-
 import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB

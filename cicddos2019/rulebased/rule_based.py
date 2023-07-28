@@ -1,5 +1,3 @@
-#  Copyright (c) 2023. Kağan Özgün ITU Computer Engineering
-
 import pandas as pd
 from sklearn.metrics import classification_report
 

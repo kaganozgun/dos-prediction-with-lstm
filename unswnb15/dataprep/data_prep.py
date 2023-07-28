@@ -1,4 +1,3 @@
-#  Copyright (c) 2023. Kağan Özgün ITU Computer Engineering
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
