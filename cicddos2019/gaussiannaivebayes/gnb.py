@@ -27,10 +27,25 @@ def cicddos2019_gaussian_naive_bayes(base_path):
                 y_test = np.load(f"{path}/y_test_data.npy")
                 y_test = y_test.reshape(-1)
 
-                clf = GaussianNB()
+                clf = GaussianNB(var_smoothing=0.01)
                 clf.fit(x_train, y_train)
-                y_pred = clf.predict(x_test)
-                report = classification_report(y_test, y_pred, output_dict=True)
+
+                prob = clf.predict_proba(x_test)
+                level_1 = []
+                level_2 = []
+                for _, p in prob:
+                    if p <= 0.5:
+                        level_1.append(0)
+                        level_2.append(0)
+                    elif p <= 0.75:
+                        level_1.append(1)
+                        level_2.append(0)
+                    else:
+                        level_1.append(1)
+                        level_2.append(1)
+
+                report = classification_report(y_test, level_1, output_dict=True)
+                report_2 = classification_report(y_test, level_2, output_dict=True)
 
                 df_tmp = pd.DataFrame({'test_shape': '70-30',
                                        'data_type': t,
@@ -38,13 +53,20 @@ def cicddos2019_gaussian_naive_bayes(base_path):
                                        'win_2': window_2,
                                        'pred_sec': window_2 / 10,
                                        'test_data_size': len(y_test),
-                                       'accuracy': report["accuracy"],
-                                       'recall_0': report["0.0"]["recall"],
-                                       'recall_1': report["1.0"]["recall"],
-                                       'precision_0': report["0.0"]["precision"],
-                                       'precision_1': report["1.0"]["precision"],
-                                       'f1_score_0': report["0.0"]["f1-score"],
-                                       'f1_score_1': report["1.0"]["f1-score"]}, index=[0])
+                                       'accuracy_lvl_1': report["accuracy"],
+                                       'recall_0_lvl_1': report["0.0"]["recall"],
+                                       'recall_1_lvl_1': report["1.0"]["recall"],
+                                       'precision_0_lvl_1': report["0.0"]["precision"],
+                                       'precision_1_lvl_1': report["1.0"]["precision"],
+                                       'f1_score_0_lvl_1': report["0.0"]["f1-score"],
+                                       'f1_score_1_lvl_1': report["1.0"]["f1-score"],
+                                       'accuracy_lvl_2': report_2["accuracy"],
+                                       'recall_0_lvl_2': report_2["0.0"]["recall"],
+                                       'recall_1_lvl_2': report_2["1.0"]["recall"],
+                                       'precision_0_lvl_2': report_2["0.0"]["precision"],
+                                       'precision_1_lvl_2': report_2["1.0"]["precision"],
+                                       'f1_score_0_lvl_2': report_2["0.0"]["f1-score"],
+                                       'f1_score_1_lvl_2': report_2["1.0"]["f1-score"]}, index=[0])
                 result_df = pd.concat([result_df, df_tmp], ignore_index=True)
 
     path = 'results/cicddos2019-gnb-results.xlsx'

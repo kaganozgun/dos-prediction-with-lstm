@@ -16,8 +16,22 @@ def cicddos2019_test(base_path):
                     y_test = y_test.reshape(-1)
 
                     model = load_model(f"{path}/final.h5")
-                    y_pred = np.round(model.predict(x_test)).flatten()
-                    report = classification_report(y_test, y_pred, output_dict=True)
+                    prob = model.predict(x_test).flatten()
+                    level_1 = []
+                    level_2 = []
+                    for p in prob:
+                        if p <= 0.5:
+                            level_1.append(0)
+                            level_2.append(0)
+                        elif p <= 0.75:
+                            level_1.append(1)
+                            level_2.append(0)
+                        else:
+                            level_1.append(1)
+                            level_2.append(1)
+
+                    report = classification_report(y_test, level_1, output_dict=True)
+                    report_2 = classification_report(y_test, level_2, output_dict=True)
 
                     df_tmp = pd.DataFrame({'test_shape': split_shape,
                                            'data_type': data_type, 'win_1': window_1, 'win_2': window_2,
@@ -29,8 +43,17 @@ def cicddos2019_test(base_path):
                                            'precision_0': report["0.0"]["precision"],
                                            'precision_1': report["1.0"]["precision"],
                                            'f1_score_0': report["0.0"]["f1-score"],
-                                           'f1_score_1': report["1.0"]["f1-score"]}, index=[0])
+                                           'f1_score_1': report["1.0"]["f1-score"],
+                                           'accuracy_lvl_2': report_2["accuracy"],
+                                           'recall_0_lvl_2': report_2["0.0"]["recall"],
+                                           'recall_1_lvl_2': report_2["1.0"]["recall"],
+                                           'precision_0_lvl_2': report_2["0.0"]["precision"],
+                                           'precision_1_lvl_2': report_2["1.0"]["precision"],
+                                           'f1_score_0_lvl_2': report_2["0.0"]["f1-score"],
+                                           'f1_score_1_lvl_2': report_2["1.0"]["f1-score"]
+                                           }, index=[0])
                     result_df = pd.concat([result_df, df_tmp], ignore_index=True)
+
 
     path = 'results/cicddos2019-lstm-results.xlsx'
     data_to_excel = pd.ExcelWriter(path)

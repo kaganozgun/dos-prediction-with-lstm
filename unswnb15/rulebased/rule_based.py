@@ -26,7 +26,7 @@ def calculate_rule_based_unswnb15_srcip_dport(data):
 
     for window_1 in [20, 50, 100, 200]:
         for window_2_out in [300, 600, 1200, 1800, 2400, 3000]:
-            x, y, y_pred_1, y_pred_2, y_pred_3, y_pred_4, y_pred_5 = [], [], [], [], [], [], []
+            x, y, y_pred_1, y_pred_2 = [], [], [], []
             for index in range(len(data)):
                 out_index = index + window_1 + window_2_out - 1
                 if out_index >= len(data):
@@ -41,25 +41,16 @@ def calculate_rule_based_unswnb15_srcip_dport(data):
                 window_2 = data.iloc[index: index + window_1 + window_2_out]
 
                 attack_cnt = window.loc[(window['srcip'] == row.dstip) & (window['dsport'] == row.dsport)]
-                value_1 = 1 if len(attack_cnt) > 1 else 0
-                value_2 = 1 if len(attack_cnt) > 2 else 0
-                value_3 = 1 if len(attack_cnt) > 3 else 0
-                value_4 = 1 if len(attack_cnt) > 4 else 0
-                value_5 = 1 if len(attack_cnt) > 5 else 0
+                value_1 = 1 if len(attack_cnt) > 3 else 0
+                value_2 = 1 if len(attack_cnt) > 5 else 0
 
                 window_2 = window_2.values
                 y.append(window_2[-1, -1])
                 y_pred_1.append(value_1)
                 y_pred_2.append(value_2)
-                y_pred_3.append(value_3)
-                y_pred_4.append(value_4)
-                y_pred_5.append(value_5)
 
             report_1 = classification_report(y, y_pred_1, output_dict=True)
             report_2 = classification_report(y, y_pred_2, output_dict=True)
-            report_3 = classification_report(y, y_pred_3, output_dict=True)
-            report_4 = classification_report(y, y_pred_4, output_dict=True)
-            report_5 = classification_report(y, y_pred_5, output_dict=True)
 
             df_tmp = pd.DataFrame({'data_type': 'srcip-dport',
                                    'rule': '>1',
@@ -72,63 +63,15 @@ def calculate_rule_based_unswnb15_srcip_dport(data):
                                    'precision_0': report_1["0"]["precision"],
                                    'precision_1': report_1["1"]["precision"],
                                    'f1_score_0': report_1["0"]["f1-score"],
-                                   'f1_score_1': report_1["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'srcip-dport',
-                                   'rule': '>2',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_2["accuracy"],
-                                   'recall_0': report_2["0"]["recall"],
-                                   'recall_1': report_2["1"]["recall"],
-                                   'precision_0': report_2["0"]["precision"],
-                                   'precision_1': report_2["1"]["precision"],
-                                   'f1_score_0': report_2["0"]["f1-score"],
-                                   'f1_score_1': report_2["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'srcip-dport',
-                                   'rule': '>3',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_3["accuracy"],
-                                   'recall_0': report_3["0"]["recall"],
-                                   'recall_1': report_3["1"]["recall"],
-                                   'precision_0': report_3["0"]["precision"],
-                                   'precision_1': report_3["1"]["precision"],
-                                   'f1_score_0': report_3["0"]["f1-score"],
-                                   'f1_score_1': report_3["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'srcip-dport',
-                                   'rule': '>4',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_4["accuracy"],
-                                   'recall_0': report_4["0"]["recall"],
-                                   'recall_1': report_4["1"]["recall"],
-                                   'precision_0': report_4["0"]["precision"],
-                                   'precision_1': report_4["1"]["precision"],
-                                   'f1_score_0': report_4["0"]["f1-score"],
-                                   'f1_score_1': report_4["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'srcip-dport',
-                                   'rule': '>5',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_5["accuracy"],
-                                   'recall_0': report_5["0"]["recall"],
-                                   'recall_1': report_5["1"]["recall"],
-                                   'precision_0': report_5["0"]["precision"],
-                                   'precision_1': report_5["1"]["precision"],
-                                   'f1_score_0': report_5["0"]["f1-score"],
-                                   'f1_score_1': report_5["1"]["f1-score"]}, index=[0])
+                                   'f1_score_1': report_1["1"]["f1-score"],
+                                   'accuracy_lvl_2': report_2["accuracy"],
+                                   'recall_0_lvl_2': report_2["0"]["recall"],
+                                   'recall_1_lvl_2': report_2["1"]["recall"],
+                                   'precision_0_lvl_2': report_2["0"]["precision"],
+                                   'precision_1_lvl_2': report_2["1"]["precision"],
+                                   'f1_score_0_lvl_2': report_2["0"]["f1-score"],
+                                   'f1_score_1_lvl_2': report_2["1"]["f1-score"]
+                                   }, index=[0])
             result_df = pd.concat([result_df, df_tmp], ignore_index=True)
 
     path = 'results/unswnb15-rule-based-srcip-dport-results.xlsx'
@@ -142,7 +85,7 @@ def calculate_rule_based_unswnb15_dstip_dport(data):
 
     for window_1 in [20, 50, 100, 200]:
         for window_2_out in [300, 600, 1200, 1800, 2400, 3000]:
-            x, y, y_pred_1, y_pred_2, y_pred_3, y_pred_4, y_pred_5 = [], [], [], [], [], [], []
+            x, y, y_pred_1, y_pred_2 = [], [], [], []
             for index in range(len(data)):
                 out_index = index + window_1 + window_2_out - 1
                 if out_index >= len(data):
@@ -157,25 +100,16 @@ def calculate_rule_based_unswnb15_dstip_dport(data):
                 window_2 = data.iloc[index: index + window_1 + window_2_out]
 
                 attack_cnt = window.loc[(window['dstip'] == row.dstip) & (window['dsport'] == row.dsport)]
-                value_1 = 1 if len(attack_cnt) > 1 else 0
-                value_2 = 1 if len(attack_cnt) > 2 else 0
-                value_3 = 1 if len(attack_cnt) > 3 else 0
-                value_4 = 1 if len(attack_cnt) > 4 else 0
-                value_5 = 1 if len(attack_cnt) > 5 else 0
+                value_1 = 1 if len(attack_cnt) > 3 else 0
+                value_2 = 1 if len(attack_cnt) > 5 else 0
 
                 window_2 = window_2.values
                 y.append(window_2[-1, -1])
                 y_pred_1.append(value_1)
                 y_pred_2.append(value_2)
-                y_pred_3.append(value_3)
-                y_pred_4.append(value_4)
-                y_pred_5.append(value_5)
 
             report_1 = classification_report(y, y_pred_1, output_dict=True)
             report_2 = classification_report(y, y_pred_2, output_dict=True)
-            report_3 = classification_report(y, y_pred_3, output_dict=True)
-            report_4 = classification_report(y, y_pred_4, output_dict=True)
-            report_5 = classification_report(y, y_pred_5, output_dict=True)
 
             df_tmp = pd.DataFrame({'data_type': 'dstip-dport',
                                    'rule': '>1',
@@ -188,63 +122,15 @@ def calculate_rule_based_unswnb15_dstip_dport(data):
                                    'precision_0': report_1["0"]["precision"],
                                    'precision_1': report_1["1"]["precision"],
                                    'f1_score_0': report_1["0"]["f1-score"],
-                                   'f1_score_1': report_1["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'dstip-dport',
-                                   'rule': '>2',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_2["accuracy"],
-                                   'recall_0': report_2["0"]["recall"],
-                                   'recall_1': report_2["1"]["recall"],
-                                   'precision_0': report_2["0"]["precision"],
-                                   'precision_1': report_2["1"]["precision"],
-                                   'f1_score_0': report_2["0"]["f1-score"],
-                                   'f1_score_1': report_2["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'dstip-dport',
-                                   'rule': '>3',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_3["accuracy"],
-                                   'recall_0': report_3["0"]["recall"],
-                                   'recall_1': report_3["1"]["recall"],
-                                   'precision_0': report_3["0"]["precision"],
-                                   'precision_1': report_3["1"]["precision"],
-                                   'f1_score_0': report_3["0"]["f1-score"],
-                                   'f1_score_1': report_3["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'dstip-dport',
-                                   'rule': '>4',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_4["accuracy"],
-                                   'recall_0': report_4["0"]["recall"],
-                                   'recall_1': report_4["1"]["recall"],
-                                   'precision_0': report_4["0"]["precision"],
-                                   'precision_1': report_4["1"]["precision"],
-                                   'f1_score_0': report_4["0"]["f1-score"],
-                                   'f1_score_1': report_4["1"]["f1-score"]}, index=[0])
-            result_df = pd.concat([result_df, df_tmp], ignore_index=True)
-
-            df_tmp = pd.DataFrame({'data_type': 'dstip-dport',
-                                   'rule': '>5',
-                                   'win_1': window_1,
-                                   'win_2': window_2_out,
-                                   'pred_sec': window_2_out / 10,
-                                   'accuracy': report_5["accuracy"],
-                                   'recall_0': report_5["0"]["recall"],
-                                   'recall_1': report_5["1"]["recall"],
-                                   'precision_0': report_5["0"]["precision"],
-                                   'precision_1': report_5["1"]["precision"],
-                                   'f1_score_0': report_5["0"]["f1-score"],
-                                   'f1_score_1': report_5["1"]["f1-score"]}, index=[0])
+                                   'f1_score_1': report_1["1"]["f1-score"],
+                                   'accuracy_lvl_2': report_2["accuracy"],
+                                   'recall_0_lvl_2': report_2["0"]["recall"],
+                                   'recall_1_lvl_2': report_2["1"]["recall"],
+                                   'precision_0_lvl_2': report_2["0"]["precision"],
+                                   'precision_1_lvl_2': report_2["1"]["precision"],
+                                   'f1_score_0_lvl_2': report_2["0"]["f1-score"],
+                                   'f1_score_1_lvl_2': report_2["1"]["f1-score"]
+                                   }, index=[0])
             result_df = pd.concat([result_df, df_tmp], ignore_index=True)
 
     path = 'results/unswnb15-rule-based-dstip-dport-results.xlsx'

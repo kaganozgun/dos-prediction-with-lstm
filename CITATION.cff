@@ -1,0 +1,9 @@
+cff-version: 1.0.2
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Ozgun"
+  given-names: "Kagan"
+title: "A Recommender System to Detect Distributed Denial of Service Attacks with Network and Transport Layer Features"
+version: 1.0.2
+date-released: 2023-12-09
+url: "https://github.com/kaganozgun/dos-prediction-with-lstm"
